@@ -9,38 +9,299 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShareSlugRouteImport } from './routes/share.$slug'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCitiesRouteImport } from './routes/_authenticated/cities'
+import { Route as AuthenticatedActivitiesRouteImport } from './routes/_authenticated/activities'
+import { Route as AuthenticatedTripsIndexRouteImport } from './routes/_authenticated/trips.index'
+import { Route as AuthenticatedTripsNewRouteImport } from './routes/_authenticated/trips.new'
+import { Route as AuthenticatedTripsGenerateRouteImport } from './routes/_authenticated/trips.generate'
+import { Route as AuthenticatedTripsTripIdIndexRouteImport } from './routes/_authenticated/trips.$tripId.index'
+import { Route as AuthenticatedTripsTripIdTimelineRouteImport } from './routes/_authenticated/trips.$tripId.timeline'
+import { Route as AuthenticatedTripsTripIdShareRouteImport } from './routes/_authenticated/trips.$tripId.share'
+import { Route as AuthenticatedTripsTripIdNotesRouteImport } from './routes/_authenticated/trips.$tripId.notes'
+import { Route as AuthenticatedTripsTripIdItineraryRouteImport } from './routes/_authenticated/trips.$tripId.itinerary'
+import { Route as AuthenticatedTripsTripIdEditRouteImport } from './routes/_authenticated/trips.$tripId.edit'
+import { Route as AuthenticatedTripsTripIdChecklistRouteImport } from './routes/_authenticated/trips.$tripId.checklist'
+import { Route as AuthenticatedTripsTripIdBudgetRouteImport } from './routes/_authenticated/trips.$tripId.budget'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShareSlugRoute = ShareSlugRouteImport.update({
+  id: '/share/$slug',
+  path: '/share/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCitiesRoute = AuthenticatedCitiesRouteImport.update({
+  id: '/cities',
+  path: '/cities',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedActivitiesRoute = AuthenticatedActivitiesRouteImport.update({
+  id: '/activities',
+  path: '/activities',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTripsIndexRoute = AuthenticatedTripsIndexRouteImport.update({
+  id: '/trips/',
+  path: '/trips/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTripsNewRoute = AuthenticatedTripsNewRouteImport.update({
+  id: '/trips/new',
+  path: '/trips/new',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedTripsGenerateRoute =
+  AuthenticatedTripsGenerateRouteImport.update({
+    id: '/trips/generate',
+    path: '/trips/generate',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTripsTripIdIndexRoute =
+  AuthenticatedTripsTripIdIndexRouteImport.update({
+    id: '/trips/$tripId/',
+    path: '/trips/$tripId/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTripsTripIdTimelineRoute =
+  AuthenticatedTripsTripIdTimelineRouteImport.update({
+    id: '/trips/$tripId/timeline',
+    path: '/trips/$tripId/timeline',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTripsTripIdShareRoute =
+  AuthenticatedTripsTripIdShareRouteImport.update({
+    id: '/trips/$tripId/share',
+    path: '/trips/$tripId/share',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTripsTripIdNotesRoute =
+  AuthenticatedTripsTripIdNotesRouteImport.update({
+    id: '/trips/$tripId/notes',
+    path: '/trips/$tripId/notes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTripsTripIdItineraryRoute =
+  AuthenticatedTripsTripIdItineraryRouteImport.update({
+    id: '/trips/$tripId/itinerary',
+    path: '/trips/$tripId/itinerary',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTripsTripIdEditRoute =
+  AuthenticatedTripsTripIdEditRouteImport.update({
+    id: '/trips/$tripId/edit',
+    path: '/trips/$tripId/edit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTripsTripIdChecklistRoute =
+  AuthenticatedTripsTripIdChecklistRouteImport.update({
+    id: '/trips/$tripId/checklist',
+    path: '/trips/$tripId/checklist',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTripsTripIdBudgetRoute =
+  AuthenticatedTripsTripIdBudgetRouteImport.update({
+    id: '/trips/$tripId/budget',
+    path: '/trips/$tripId/budget',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/activities': typeof AuthenticatedActivitiesRoute
+  '/cities': typeof AuthenticatedCitiesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/share/$slug': typeof ShareSlugRoute
+  '/trips/generate': typeof AuthenticatedTripsGenerateRoute
+  '/trips/new': typeof AuthenticatedTripsNewRoute
+  '/trips/': typeof AuthenticatedTripsIndexRoute
+  '/trips/$tripId/budget': typeof AuthenticatedTripsTripIdBudgetRoute
+  '/trips/$tripId/checklist': typeof AuthenticatedTripsTripIdChecklistRoute
+  '/trips/$tripId/edit': typeof AuthenticatedTripsTripIdEditRoute
+  '/trips/$tripId/itinerary': typeof AuthenticatedTripsTripIdItineraryRoute
+  '/trips/$tripId/notes': typeof AuthenticatedTripsTripIdNotesRoute
+  '/trips/$tripId/share': typeof AuthenticatedTripsTripIdShareRoute
+  '/trips/$tripId/timeline': typeof AuthenticatedTripsTripIdTimelineRoute
+  '/trips/$tripId/': typeof AuthenticatedTripsTripIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/activities': typeof AuthenticatedActivitiesRoute
+  '/cities': typeof AuthenticatedCitiesRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/share/$slug': typeof ShareSlugRoute
+  '/trips/generate': typeof AuthenticatedTripsGenerateRoute
+  '/trips/new': typeof AuthenticatedTripsNewRoute
+  '/trips': typeof AuthenticatedTripsIndexRoute
+  '/trips/$tripId/budget': typeof AuthenticatedTripsTripIdBudgetRoute
+  '/trips/$tripId/checklist': typeof AuthenticatedTripsTripIdChecklistRoute
+  '/trips/$tripId/edit': typeof AuthenticatedTripsTripIdEditRoute
+  '/trips/$tripId/itinerary': typeof AuthenticatedTripsTripIdItineraryRoute
+  '/trips/$tripId/notes': typeof AuthenticatedTripsTripIdNotesRoute
+  '/trips/$tripId/share': typeof AuthenticatedTripsTripIdShareRoute
+  '/trips/$tripId/timeline': typeof AuthenticatedTripsTripIdTimelineRoute
+  '/trips/$tripId': typeof AuthenticatedTripsTripIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/_authenticated/activities': typeof AuthenticatedActivitiesRoute
+  '/_authenticated/cities': typeof AuthenticatedCitiesRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/share/$slug': typeof ShareSlugRoute
+  '/_authenticated/trips/generate': typeof AuthenticatedTripsGenerateRoute
+  '/_authenticated/trips/new': typeof AuthenticatedTripsNewRoute
+  '/_authenticated/trips/': typeof AuthenticatedTripsIndexRoute
+  '/_authenticated/trips/$tripId/budget': typeof AuthenticatedTripsTripIdBudgetRoute
+  '/_authenticated/trips/$tripId/checklist': typeof AuthenticatedTripsTripIdChecklistRoute
+  '/_authenticated/trips/$tripId/edit': typeof AuthenticatedTripsTripIdEditRoute
+  '/_authenticated/trips/$tripId/itinerary': typeof AuthenticatedTripsTripIdItineraryRoute
+  '/_authenticated/trips/$tripId/notes': typeof AuthenticatedTripsTripIdNotesRoute
+  '/_authenticated/trips/$tripId/share': typeof AuthenticatedTripsTripIdShareRoute
+  '/_authenticated/trips/$tripId/timeline': typeof AuthenticatedTripsTripIdTimelineRoute
+  '/_authenticated/trips/$tripId/': typeof AuthenticatedTripsTripIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/activities'
+    | '/cities'
+    | '/dashboard'
+    | '/profile'
+    | '/share/$slug'
+    | '/trips/generate'
+    | '/trips/new'
+    | '/trips/'
+    | '/trips/$tripId/budget'
+    | '/trips/$tripId/checklist'
+    | '/trips/$tripId/edit'
+    | '/trips/$tripId/itinerary'
+    | '/trips/$tripId/notes'
+    | '/trips/$tripId/share'
+    | '/trips/$tripId/timeline'
+    | '/trips/$tripId/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/signup'
+    | '/activities'
+    | '/cities'
+    | '/dashboard'
+    | '/profile'
+    | '/share/$slug'
+    | '/trips/generate'
+    | '/trips/new'
+    | '/trips'
+    | '/trips/$tripId/budget'
+    | '/trips/$tripId/checklist'
+    | '/trips/$tripId/edit'
+    | '/trips/$tripId/itinerary'
+    | '/trips/$tripId/notes'
+    | '/trips/$tripId/share'
+    | '/trips/$tripId/timeline'
+    | '/trips/$tripId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/signup'
+    | '/_authenticated/activities'
+    | '/_authenticated/cities'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/profile'
+    | '/share/$slug'
+    | '/_authenticated/trips/generate'
+    | '/_authenticated/trips/new'
+    | '/_authenticated/trips/'
+    | '/_authenticated/trips/$tripId/budget'
+    | '/_authenticated/trips/$tripId/checklist'
+    | '/_authenticated/trips/$tripId/edit'
+    | '/_authenticated/trips/$tripId/itinerary'
+    | '/_authenticated/trips/$tripId/notes'
+    | '/_authenticated/trips/$tripId/share'
+    | '/_authenticated/trips/$tripId/timeline'
+    | '/_authenticated/trips/$tripId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
+  ShareSlugRoute: typeof ShareSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +309,180 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/share/$slug': {
+      id: '/share/$slug'
+      path: '/share/$slug'
+      fullPath: '/share/$slug'
+      preLoaderRoute: typeof ShareSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cities': {
+      id: '/_authenticated/cities'
+      path: '/cities'
+      fullPath: '/cities'
+      preLoaderRoute: typeof AuthenticatedCitiesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/activities': {
+      id: '/_authenticated/activities'
+      path: '/activities'
+      fullPath: '/activities'
+      preLoaderRoute: typeof AuthenticatedActivitiesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/': {
+      id: '/_authenticated/trips/'
+      path: '/trips'
+      fullPath: '/trips/'
+      preLoaderRoute: typeof AuthenticatedTripsIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/new': {
+      id: '/_authenticated/trips/new'
+      path: '/trips/new'
+      fullPath: '/trips/new'
+      preLoaderRoute: typeof AuthenticatedTripsNewRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/generate': {
+      id: '/_authenticated/trips/generate'
+      path: '/trips/generate'
+      fullPath: '/trips/generate'
+      preLoaderRoute: typeof AuthenticatedTripsGenerateRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/$tripId/': {
+      id: '/_authenticated/trips/$tripId/'
+      path: '/trips/$tripId'
+      fullPath: '/trips/$tripId/'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/$tripId/timeline': {
+      id: '/_authenticated/trips/$tripId/timeline'
+      path: '/trips/$tripId/timeline'
+      fullPath: '/trips/$tripId/timeline'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdTimelineRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/$tripId/share': {
+      id: '/_authenticated/trips/$tripId/share'
+      path: '/trips/$tripId/share'
+      fullPath: '/trips/$tripId/share'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdShareRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/$tripId/notes': {
+      id: '/_authenticated/trips/$tripId/notes'
+      path: '/trips/$tripId/notes'
+      fullPath: '/trips/$tripId/notes'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdNotesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/$tripId/itinerary': {
+      id: '/_authenticated/trips/$tripId/itinerary'
+      path: '/trips/$tripId/itinerary'
+      fullPath: '/trips/$tripId/itinerary'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdItineraryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/$tripId/edit': {
+      id: '/_authenticated/trips/$tripId/edit'
+      path: '/trips/$tripId/edit'
+      fullPath: '/trips/$tripId/edit'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdEditRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/$tripId/checklist': {
+      id: '/_authenticated/trips/$tripId/checklist'
+      path: '/trips/$tripId/checklist'
+      fullPath: '/trips/$tripId/checklist'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdChecklistRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trips/$tripId/budget': {
+      id: '/_authenticated/trips/$tripId/budget'
+      path: '/trips/$tripId/budget'
+      fullPath: '/trips/$tripId/budget'
+      preLoaderRoute: typeof AuthenticatedTripsTripIdBudgetRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedActivitiesRoute: typeof AuthenticatedActivitiesRoute
+  AuthenticatedCitiesRoute: typeof AuthenticatedCitiesRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedTripsGenerateRoute: typeof AuthenticatedTripsGenerateRoute
+  AuthenticatedTripsNewRoute: typeof AuthenticatedTripsNewRoute
+  AuthenticatedTripsIndexRoute: typeof AuthenticatedTripsIndexRoute
+  AuthenticatedTripsTripIdBudgetRoute: typeof AuthenticatedTripsTripIdBudgetRoute
+  AuthenticatedTripsTripIdChecklistRoute: typeof AuthenticatedTripsTripIdChecklistRoute
+  AuthenticatedTripsTripIdEditRoute: typeof AuthenticatedTripsTripIdEditRoute
+  AuthenticatedTripsTripIdItineraryRoute: typeof AuthenticatedTripsTripIdItineraryRoute
+  AuthenticatedTripsTripIdNotesRoute: typeof AuthenticatedTripsTripIdNotesRoute
+  AuthenticatedTripsTripIdShareRoute: typeof AuthenticatedTripsTripIdShareRoute
+  AuthenticatedTripsTripIdTimelineRoute: typeof AuthenticatedTripsTripIdTimelineRoute
+  AuthenticatedTripsTripIdIndexRoute: typeof AuthenticatedTripsTripIdIndexRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedActivitiesRoute: AuthenticatedActivitiesRoute,
+  AuthenticatedCitiesRoute: AuthenticatedCitiesRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedTripsGenerateRoute: AuthenticatedTripsGenerateRoute,
+  AuthenticatedTripsNewRoute: AuthenticatedTripsNewRoute,
+  AuthenticatedTripsIndexRoute: AuthenticatedTripsIndexRoute,
+  AuthenticatedTripsTripIdBudgetRoute: AuthenticatedTripsTripIdBudgetRoute,
+  AuthenticatedTripsTripIdChecklistRoute:
+    AuthenticatedTripsTripIdChecklistRoute,
+  AuthenticatedTripsTripIdEditRoute: AuthenticatedTripsTripIdEditRoute,
+  AuthenticatedTripsTripIdItineraryRoute:
+    AuthenticatedTripsTripIdItineraryRoute,
+  AuthenticatedTripsTripIdNotesRoute: AuthenticatedTripsTripIdNotesRoute,
+  AuthenticatedTripsTripIdShareRoute: AuthenticatedTripsTripIdShareRoute,
+  AuthenticatedTripsTripIdTimelineRoute: AuthenticatedTripsTripIdTimelineRoute,
+  AuthenticatedTripsTripIdIndexRoute: AuthenticatedTripsTripIdIndexRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
+  ShareSlugRoute: ShareSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
