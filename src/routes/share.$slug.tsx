@@ -31,7 +31,7 @@ function SharedTrip() {
         supabase.from("notes").select("title, content, created_at").eq("trip_id", share.trip_id).order("created_at", { ascending: false }),
         supabase.from("checklist_items").select("title, category").eq("trip_id", share.trip_id),
       ]);
-      const stopIds = (stops.data ?? []).map((s) => s.id);
+      const stopIds = (stops.data ?? []).map((s: { id: string }) => s.id);
       const acts = stopIds.length
         ? (await supabase.from("activities").select("*").in("stop_id", stopIds).order("created_at")).data ?? []
         : [];
