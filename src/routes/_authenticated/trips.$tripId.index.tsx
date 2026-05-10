@@ -21,7 +21,7 @@ function TripOverview() {
       const [trip, stops, activities, budget, checklist, notes, share] = await Promise.all([
         supabase.from("trips").select("*").eq("id", tripId).single(),
         supabase.from("stops").select("*").eq("trip_id", tripId),
-        supabase.from("activities").select("id, stop_id, cost").in("stop_id", (await supabase.from("stops").select("id").eq("trip_id", tripId)).data?.map(s => s.id) ?? []),
+        supabase.from("activities").select("id, stop_id, cost").in("stop_id", (await supabase.from("stops").select("id").eq("trip_id", tripId)).data?.map((s: { id: string }) => s.id) ?? []),
         supabase.from("budget_items").select("amount").eq("trip_id", tripId),
         supabase.from("checklist_items").select("is_packed").eq("trip_id", tripId),
         supabase.from("notes").select("id").eq("trip_id", tripId),
