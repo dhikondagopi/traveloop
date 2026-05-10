@@ -40,7 +40,7 @@ function Dashboard() {
   const name = user?.user_metadata?.name || user?.email?.split("@")[0];
 
   const today = new Date().toISOString().slice(0, 10);
-  const upcoming = trips.filter((t: any) => t.start_date && t.start_date >= today);
+  const upcoming = trips.filter((t: any) => !t.start_date || t.start_date >= today);
 
   const totalBudget = trips.reduce((s: number, t: any) => s + Number(t.planned_budget || 0), 0);
   const totalStops = trips.reduce((s: number, t: any) => s + (t.stops?.length ?? 0), 0);
