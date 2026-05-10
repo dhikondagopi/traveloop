@@ -36,7 +36,7 @@ function Timeline() {
         supabase.from("trips").select("*").eq("id", tripId).single(),
         supabase.from("stops").select("*").eq("trip_id", tripId).order("stop_order"),
       ]);
-      const stopIds = (stops ?? []).map((s) => s.id);
+      const stopIds = (stops ?? []).map((s: { id: string }) => s.id);
       const { data: acts } = stopIds.length
         ? await supabase.from("activities").select("*").in("stop_id", stopIds).order("start_time")
         : { data: [] as any[] };
