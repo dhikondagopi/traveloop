@@ -2,11 +2,18 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Loading } from "@/components/Loading";
 import { Search, Plus, MapPin, TrendingUp, DollarSign } from "lucide-react";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/_authenticated/cities")({
   head: () => ({ meta: [{ title: "Discover Cities — Traveloop" }] }),
@@ -14,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/cities")({
 });
 
 function CitiesPage() {
+  const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [region, setRegion] = useState("All");
 
@@ -22,8 +30,12 @@ function CitiesPage() {
     queryFn: async () => (await supabase.from("cities").select("*").order("popularity", { ascending: false })).data ?? [],
   });
   const trips = useQuery({
-    queryKey: ["trips-min"],
-    queryFn: async () => (await supabase.from("trips").select("id, name").order("created_at", { ascending: false })).data ?? [],
+    queryKey: ["trips-min", user?.id],
+    queryFn: async () => {
+      if (!user) return [];
+      return (await supabase.from("trips").select("id, name").eq("user_id", user.id).order("created_at", { ascending: false })).data ?? [];
+    },
+    enabled: !!user,
   });
 
   if (cities.isLoading) return <Loading />;
@@ -62,22 +74,22 @@ function CitiesPage() {
         </select>
       </div>
 
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
         {filtered.map((c: any) => (
-          <div key={c.id} className="group rounded-2xl overflow-hidden glass shadow-card hover:shadow-glow transition-all hover:-translate-y-1">
-            <div className="h-48 relative overflow-hidden">
+          <div key={c.id} className="group rounded-2xl glass shadow-card hover:shadow-glow transition-all hover:-translate-y-1 flex flex-col">
+            <div className="h-52 relative overflow-hidden rounded-t-2xl">
               <img src={c.image_url} alt={c.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-              <div className="absolute bottom-3 left-4 text-white">
-                <p className="text-xs opacity-80">{c.country}</p>
-                <h3 className="text-xl font-bold">{c.name}</h3>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+              <div className="absolute bottom-4 left-4 text-white">
+                <p className="text-xs font-medium text-white/80 uppercase tracking-wider mb-1">{c.country}</p>
+                <h3 className="text-2xl font-bold">{c.name}</h3>
               </div>
             </div>
-            <div className="p-4">
-              <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
-                <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {c.region}</span>
-                <span className="flex items-center gap-1"><TrendingUp className="w-3 h-3" /> {c.popularity}</span>
-                <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" /> {c.cost_index}</span>
+            <div className="p-5 flex-1 flex flex-col justify-between">
+              <div className="flex items-center justify-between text-xs text-muted-foreground mb-5">
+                <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5 text-primary" /> {c.region}</span>
+                <span className="flex items-center gap-1.5"><TrendingUp className="w-3.5 h-3.5 text-blue-500" /> {c.popularity}</span>
+                <span className="flex items-center gap-1.5"><DollarSign className="w-3.5 h-3.5 text-green-500" /> {c.cost_index}</span>
               </div>
               <AddCityButton city={c} trips={trips.data ?? []} onAdd={addToTrip} />
             </div>
@@ -89,21 +101,21 @@ function CitiesPage() {
 }
 
 function AddCityButton({ city, trips, onAdd }: { city: any; trips: any[]; onAdd: (c: any, t: string) => void }) {
-  const [open, setOpen] = useState(false);
   if (trips.length === 0) {
     return <Button variant="outline" size="sm" className="w-full" disabled>Create a trip first</Button>;
   }
   return (
-    <div className="relative">
-      <Button onClick={() => setOpen(!open)} size="sm" className="w-full bg-gradient-hero"><Plus className="w-3 h-3 mr-1" /> Add to trip</Button>
-      {open && (
-        <div className="absolute z-10 mt-1 w-full rounded-xl glass shadow-card border max-h-60 overflow-auto">
-          {trips.map((t) => (
-            <button key={t.id} onClick={() => { onAdd(city, t.id); setOpen(false); }}
-              className="w-full text-left px-3 py-2 text-sm hover:bg-accent">{t.name}</button>
-          ))}
-        </div>
-      )}
-    </div>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="sm" className="w-full bg-gradient-hero"><Plus className="w-3 h-3 mr-1" /> Add to trip</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] glass min-w-[200px]" align="start">
+        {trips.map((t) => (
+          <DropdownMenuItem key={t.id} onClick={() => onAdd(city, t.id)} className="cursor-pointer">
+            {t.name}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

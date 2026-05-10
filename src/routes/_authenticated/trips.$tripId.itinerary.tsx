@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loading } from "@/components/Loading";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, Plus, MapPin, Trash2, Clock, DollarSign, Sparkles } from "lucide-react";
+import { ArrowLeft, Plus, MapPin, Trash2, Clock, DollarSign, Sparkles, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/trips/$tripId/itinerary")({
@@ -38,6 +38,11 @@ function Itinerary() {
 
   const [stopForm, setStopForm] = useState({ city: "", country: "", start_date: "", end_date: "", notes: "" });
   const [openStop, setOpenStop] = useState(false);
+  const [completedStops, setCompletedStops] = useState<Record<string, boolean>>({});
+  const [completedActs, setCompletedActs] = useState<Record<string, boolean>>({});
+
+  const toggleCompleted = (id: string) => setCompletedStops(prev => ({ ...prev, [id]: !prev[id] }));
+  const toggleActCompleted = (id: string) => setCompletedActs(prev => ({ ...prev, [id]: !prev[id] }));
 
   const addStop = useMutation({
     mutationFn: async () => {
@@ -98,60 +103,200 @@ function Itinerary() {
         <div className="rounded-3xl glass p-12 text-center shadow-card">
           <div className="w-16 h-16 mx-auto mb-3 rounded-2xl bg-gradient-ocean flex items-center justify-center"><MapPin className="w-8 h-8 text-white" /></div>
           <h3 className="text-lg font-semibold">No stops yet</h3>
-          <p className="text-muted-foreground text-sm">Add your first city to start building.</p>
+          <p className="text-muted-foreground text-sm">Add your first city to start building your roadmap.</p>
         </div>
       ) : (
-        <div className="relative pl-6 md:pl-10 space-y-8 before:absolute before:left-2 md:before:left-4 before:top-2 before:bottom-2 before:w-0.5 before:bg-gradient-to-b before:from-primary before:to-teal">
-          {stops.map((s: any, idx: number) => (
-            <div key={s.id} className="relative">
-              <div className="absolute -left-6 md:-left-10 top-1 w-5 h-5 rounded-full bg-gradient-hero ring-4 ring-background shadow-glow" />
-              <div className="rounded-2xl glass shadow-card p-6">
-                <div className="flex items-start justify-between gap-3 flex-wrap">
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-primary font-semibold">Stop {idx + 1}</p>
-                    <h3 className="text-2xl font-bold mt-1">{s.city}{s.country && <span className="text-muted-foreground font-normal">, {s.country}</span>}</h3>
-                    {(s.start_date || s.end_date) && <p className="text-sm text-muted-foreground mt-1">{s.start_date} → {s.end_date}</p>}
-                    {s.notes && <p className="mt-2 text-sm">{s.notes}</p>}
-                  </div>
-                  <Button variant="ghost" size="sm" onClick={() => { if (confirm("Delete this stop and all its activities?")) delStop.mutate(s.id); }}>
-                    <Trash2 className="w-4 h-4 text-destructive" />
-                  </Button>
-                </div>
-
-                {/* Activities */}
-                <div className="mt-5 space-y-3">
-                  {acts.filter((a: any) => a.stop_id === s.id).map((a: any) => (
-                    <div key={a.id} className="rounded-xl bg-secondary/40 p-4 flex items-start gap-3">
-                      {a.image_url && <img src={a.image_url} alt="" className="w-16 h-16 rounded-lg object-cover" />}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div>
-                            <p className="font-semibold">{a.title}</p>
-                            <p className="text-xs text-muted-foreground line-clamp-2">{a.description}</p>
-                          </div>
-                          <button onClick={() => delAct.mutate(a.id)}><Trash2 className="w-4 h-4 text-destructive/70" /></button>
-                        </div>
-                        <div className="flex flex-wrap gap-3 mt-2 text-xs text-muted-foreground">
-                          {a.category && <span className="px-2 py-0.5 rounded-full bg-accent text-accent-foreground"><Sparkles className="w-3 h-3 inline mr-1" />{a.category}</span>}
-                          {a.start_time && <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{a.start_time}</span>}
-                          {a.duration && <span>{a.duration}</span>}
-                          {a.cost > 0 && <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" />{a.cost}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  <AddActivityInline stopId={s.id} onAdded={() => qc.invalidateQueries({ queryKey: ["itinerary", tripId] })} />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <JourneyMap 
+          stops={stops} 
+          acts={acts} 
+          completedStops={completedStops} 
+          completedActs={completedActs} 
+          toggleCompleted={toggleCompleted} 
+          toggleActCompleted={toggleActCompleted}
+          delStop={delStop}
+          delAct={delAct}
+          tripId={tripId}
+          qc={qc}
+        />
       )}
     </div>
   );
 }
 
-function AddActivityInline({ stopId, onAdded }: { stopId: string; onAdded: () => void }) {
+function JourneyMap({ stops, acts, completedStops, completedActs, toggleCompleted, toggleActCompleted, delStop, delAct, tripId, qc }: any) {
+  const MAP_WIDTH = 1000;
+  const ROW_HEIGHT = 200;
+  const AMPLITUDE = 300;
+
+  // Flatten the journey into a single array
+  const journey: any[] = [];
+  stops.forEach((s: any) => {
+    journey.push({ type: 'stop', data: s, id: s.id });
+    const stopActs = acts.filter((a: any) => a.stop_id === s.id);
+    stopActs.forEach((a: any) => journey.push({ type: 'act', data: a, id: a.id }));
+    journey.push({ type: 'add_act', stopId: s.id, id: `add_${s.id}` });
+  });
+
+  const totalHeight = journey.length * ROW_HEIGHT;
+  const pathLines: string[] = [];
+  const activePathLines: string[] = [];
+  let lastCompletedIndex = -1;
+
+  journey.forEach((item, i) => {
+    let isComp = false;
+    if (item.type === 'stop') isComp = completedStops[item.id];
+    else if (item.type === 'act') isComp = completedActs[item.id];
+    if (isComp) lastCompletedIndex = i;
+  });
+
+  for (let i = 0; i < journey.length; i++) {
+    const targetY = i * ROW_HEIGHT + (ROW_HEIGHT / 2);
+    const targetX = (MAP_WIDTH / 2) + Math.sin(i * Math.PI / 2) * AMPLITUDE; 
+    
+    if (i === 0) {
+      pathLines.push(`M ${targetX} ${targetY}`);
+      if (lastCompletedIndex >= 0) activePathLines.push(`M ${targetX} ${targetY}`);
+    } else {
+      const prevY = (i - 1) * ROW_HEIGHT + (ROW_HEIGHT / 2);
+      const prevX = (MAP_WIDTH / 2) + Math.sin((i - 1) * Math.PI / 2) * AMPLITUDE;
+      const curve = `C ${prevX} ${prevY + ROW_HEIGHT/2}, ${targetX} ${targetY - ROW_HEIGHT/2}, ${targetX} ${targetY}`;
+      
+      pathLines.push(curve);
+      if (i <= lastCompletedIndex) activePathLines.push(curve);
+    }
+  }
+
+  const getImageUrl = (item: any) => {
+    if (item.type === 'act' && item.data.image_url) return item.data.image_url;
+    if (item.type === 'stop' && item.data.city) return `https://loremflickr.com/200/200/${encodeURIComponent(item.data.city)},view/all`;
+    if (item.type === 'act' && item.data.title) return `https://loremflickr.com/200/200/${encodeURIComponent(item.data.title.replace(/[^a-zA-Z0-9 ]/g, '').split(' ').slice(0,2).join(','))}/all`;
+    return null;
+  };
+
+  return (
+    <div className="relative mx-auto mt-12 mb-24 animate-fade-up w-full max-w-5xl" style={{ height: `${journey.length * 160}px` }}>
+      {/* Decorative Game Map Elements */}
+      {journey.map((_, i) => {
+        if (i % 2 !== 0) return null;
+        const targetY = i * ROW_HEIGHT + (ROW_HEIGHT / 2);
+        const topPct = (targetY / totalHeight) * 100;
+        const isLeft = (i % 4 === 0);
+        return (
+          <div key={`deco-${i}`} className="absolute text-5xl md:text-7xl opacity-30 z-0 animate-float pointer-events-none" style={{ top: `calc(${topPct}% - 40px)`, left: isLeft ? '5%' : '85%', animationDelay: `${i * 0.5}s` }}>
+            {['🌲', '☁️', '⛰️', '🌴', '🏕️', '🎈', '☁️'][i % 7]}
+          </div>
+        )
+      })}
+
+      {/* SVG Winding Paths */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" preserveAspectRatio="none" viewBox={`0 0 ${MAP_WIDTH} ${totalHeight}`}>
+        {/* Remaining transparent blue path */}
+        <path d={pathLines.join(' ')} vectorEffect="non-scaling-stroke" stroke="rgba(37,99,235,0.15)" strokeWidth="10" strokeLinecap="round" strokeDasharray="1 24" fill="none" />
+        
+        {/* Completed solid blue path */}
+        {activePathLines.length > 0 && (
+          <path d={activePathLines.join(' ')} vectorEffect="non-scaling-stroke" stroke="#2563eb" strokeWidth="10" strokeLinecap="round" fill="none" className="drop-shadow-[0_0_8px_rgba(37,99,235,0.6)]" />
+        )}
+      </svg>
+
+      {journey.map((item, i) => {
+        const targetY = i * ROW_HEIGHT + (ROW_HEIGHT / 2);
+        const targetX = (MAP_WIDTH / 2) + Math.sin(i * Math.PI / 2) * AMPLITUDE;
+        
+        const topPct = (targetY / totalHeight) * 100;
+        const leftPct = (targetX / MAP_WIDTH) * 100;
+        
+        let isComp = false;
+        if (item.type === 'stop') isComp = completedStops[item.id];
+        else if (item.type === 'act') isComp = completedActs[item.id];
+
+        // Determine if the detail card should render to the left or right of the node
+        const isLeft = targetX > (MAP_WIDTH / 2) || (targetX === (MAP_WIDTH / 2) && i % 4 === 2);
+
+        if (item.type === 'add_act') {
+          return (
+            <div key={item.id} className="absolute -translate-x-1/2 -translate-y-1/2 z-20" style={{ top: `${topPct}%`, left: `${leftPct}%` }}>
+               <AddActivityInline stopId={item.stopId} onAdded={() => qc.invalidateQueries({ queryKey: ["itinerary", tripId] })} isCompleted={lastCompletedIndex >= i} />
+            </div>
+          );
+        }
+
+        return (
+          <div 
+            key={item.id} 
+            className="absolute flex items-center gap-4 md:gap-8 -translate-y-1/2 z-20"
+            style={{ 
+              top: `${topPct}%`, 
+              left: isLeft ? 'auto' : `${leftPct}%`, 
+              right: isLeft ? `${100 - leftPct}%` : 'auto',
+              flexDirection: isLeft ? 'row-reverse' : 'row'
+            }}
+          >
+            {/* The Game Map Node */}
+            <button 
+              onClick={() => item.type === 'stop' ? toggleCompleted(item.id) : toggleActCompleted(item.id)}
+              className={`shrink-0 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 active:scale-95 ${item.type === 'stop' ? 'w-14 h-14 md:w-16 md:h-16 border-[3px]' : 'w-10 h-10 md:w-12 md:h-12 border-[2px]'} ${isComp ? 'border-primary shadow-[0_0_15px_rgba(37,99,235,0.8)]' : 'bg-white border-white shadow-md hover:border-primary/50'} relative overflow-hidden group z-20`}
+            >
+              {getImageUrl(item) ? (
+                <>
+                  <img src={getImageUrl(item)} className="w-full h-full object-cover transition-transform group-hover:scale-110" alt="" />
+                  {isComp ? (
+                    <div className="absolute inset-0 bg-blue-600/50 mix-blend-multiply flex items-center justify-center backdrop-blur-[1px]">
+                      <Check className="w-5 h-5 md:w-6 md:h-6 text-white drop-shadow-md" />
+                    </div>
+                  ) : (
+                    <div className="absolute inset-0 bg-black/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-[2px]">
+                      {item.type === 'stop' ? <MapPin className="w-5 h-5 text-white drop-shadow-md" /> : <Sparkles className="w-4 h-4 text-white drop-shadow-md" />}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className={`w-full h-full flex items-center justify-center ${isComp ? 'bg-gradient-hero text-white' : 'text-primary'}`}>
+                  {isComp ? <Check className="w-4 h-4 md:w-5 md:h-5" /> : (item.type === 'stop' ? <MapPin className="w-5 h-5 md:w-6 md:h-6" /> : <Sparkles className="w-4 h-4 md:w-5 md:h-5" />)}
+                </div>
+              )}
+            </button>
+
+            {/* Details Card */}
+            <div className={`w-32 sm:w-40 md:w-48 p-2 sm:p-3 rounded-2xl shadow-xl transition-all relative group ${isComp ? 'bg-slate-800 text-white border border-slate-700' : 'glass border border-white text-slate-800 hover:bg-white/90'}`}>
+              <button 
+                onClick={() => {
+                   if (confirm(`Delete this ${item.type}?`)) {
+                     if (item.type === 'stop') delStop.mutate(item.id);
+                     else delAct.mutate(item.id);
+                   }
+                }}
+                className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-destructive text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:scale-110"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+
+              {item.type === 'act' && getImageUrl(item) && (
+                <img src={getImageUrl(item)} className={`w-full h-12 sm:h-16 md:h-20 object-cover rounded-lg mb-2 shadow-sm ${isComp ? 'opacity-70 saturate-50' : ''}`} alt="" />
+              )}
+              
+              <p className={`text-[8px] sm:text-[9px] font-black uppercase tracking-widest mb-0.5 ${isComp ? 'text-blue-400' : 'text-primary'}`}>
+                {item.type === 'stop' ? 'City Stop' : item.data.category || 'Activity'}
+              </p>
+              <p className="text-xs sm:text-sm font-bold leading-tight line-clamp-2">
+                {item.type === 'stop' ? item.data.city : item.data.title}
+              </p>
+              
+              {(item.data.start_date || item.data.start_time) && (
+                <p className={`text-[10px] sm:text-[11px] mt-1 sm:mt-2 flex items-center gap-1 font-semibold ${isComp ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" /> 
+                  {item.type === 'stop' ? `${item.data.start_date}` : item.data.start_time}
+                </p>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function AddActivityInline({ stopId, onAdded, isCompleted }: { stopId: string; onAdded: () => void; isCompleted?: boolean }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", category: "Sightseeing", start_time: "", duration: "", cost: "", image_url: "" });
   const save = async () => {
@@ -168,7 +313,9 @@ function AddActivityInline({ stopId, onAdded }: { stopId: string; onAdded: () =>
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full border-dashed"><Plus className="w-4 h-4 mr-1" /> Add Activity</Button>
+        <button className={`w-12 h-12 rounded-full flex items-center justify-center border-4 border-dashed transition-all hover:scale-110 shadow-lg ${isCompleted ? 'border-slate-500 bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700' : 'border-primary/40 bg-white text-primary hover:bg-primary/10'}`}>
+          <Plus className="w-6 h-6" />
+        </button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader><DialogTitle>Add activity</DialogTitle></DialogHeader>

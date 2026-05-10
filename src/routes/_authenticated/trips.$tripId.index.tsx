@@ -58,7 +58,11 @@ function TripOverview() {
           {trip.description && <p className="mt-3 max-w-2xl opacity-90">{trip.description}</p>}
         </div>
         <div className="absolute top-4 right-4 flex gap-2">
-          <Link to="/trips/$tripId/edit" params={{ tripId }}><Button variant="secondary" size="sm" className="glass text-white border-white/20"><Edit3 className="w-4 h-4 mr-1" /> Edit</Button></Link>
+          <Link to="/trips/$tripId/edit" params={{ tripId }}>
+            <Button size="sm" className="bg-gradient-hero text-white shadow-[0_0_20px_rgba(37,99,235,0.6)] hover:shadow-[0_0_30px_rgba(37,99,235,0.9)] hover:scale-105 transition-all font-bold px-5 h-10 rounded-full border-2 border-white/20">
+              <Edit3 className="w-4 h-4 mr-1.5 text-white" /> Edit Trip
+            </Button>
+          </Link>
         </div>
       </div>
 

@@ -19,9 +19,9 @@ function AuthLayout() {
   if (loading || !user) return <div className="min-h-screen flex items-center justify-center"><Loading /></div>;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col md:flex-row">
       <AppNav />
-      <main className="container mx-auto px-4 py-8 md:py-10">
+      <main className="flex-1 container mx-auto px-4 py-8 md:py-10 max-w-7xl overflow-x-hidden">
         <Outlet />
       </main>
     </div>
